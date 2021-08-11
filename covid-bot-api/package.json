@@ -17,6 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "csv-string": "^4.0.1",
+    "event-stream": "^4.0.1",
     "express": "^4.17.1",
     "mongoose": "^5.13.5"
   }

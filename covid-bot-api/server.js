@@ -3,14 +3,14 @@ const cors = require("cors");
 
 const app = express();
 
-var corsOptions = {
-    origin: "http://localhost:8081"
+const corsOptions = {
+    origin: "http://localhost:3000"
 };
 
 app.use(cors(corsOptions));
 
 // database
-const db = require("./app/models");
+const db = require("./src/models");
 db.mongoose
     .connect(db.url, {
         useNewUrlParser: true,
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to Covid Bot API." });
 });
 
-require("./app/routes/case-routes")(app);
+require("./src/routes/case.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

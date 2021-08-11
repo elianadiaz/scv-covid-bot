@@ -7,14 +7,9 @@ const Genders = Object.freeze({
     Other: 'other',
 });
 
-const AgeYearMonths = Object.freeze({
-    Years: 'years',
-    Months: 'months',
-});
-
 // create case schema & model
 const CaseSchema = new Schema({
-    province: {
+    state: {
         type: String,
         required: [true, 'Province field is required'],
     },
@@ -27,11 +22,6 @@ const CaseSchema = new Schema({
         type: Number,
         required: [true, 'Age field is required'],
     },
-    age_years_months: {
-        type: String,
-        enum: Object.values(AgeYearMonths),
-        default: AgeYearMonths.Years,
-    },
     symptoms_start_date: {
         type: Date,
         default: Date.now,
@@ -39,7 +29,7 @@ const CaseSchema = new Schema({
     death_date: {
         type: Date,
     },
-    last_update_system_external: {
+    creation_date: {
         type: Date,
         default: Date.now,
     },
@@ -47,7 +37,6 @@ const CaseSchema = new Schema({
 
 Object.assign(CaseSchema.statics, {
     Genders,
-    AgeYearMonths,
 });
 
 const Case = mongoose.model('case', CaseSchema);
