@@ -42,3 +42,4 @@ Object.assign(CaseSchema.statics, {
 const Case = mongoose.model('case', CaseSchema);
 
 module.exports = Case;
+module.exports = Genders;

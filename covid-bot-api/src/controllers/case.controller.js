@@ -14,12 +14,17 @@ const caseController = {
         const casesSearch = new CasesSearch(req.query.date_from, req.query.date_to, req.query.age_from,
             req.query.age_to, req.query.gender, req.query.state);
 
-        const result = await caseReportService.getTotalCases(casesSearch);
-
-        return res
-            .status(result.toHttpStatus())
-            .statusCode(result.toHttpStatusCode())
-            .json(result.result);
+        caseReportService.getTotalCases(casesSearch)
+            .then(data => {
+                res
+                    .status(200)
+                    .json({total_cases_registers: data ? data.length : 0});
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .json({message: err.message || "Some error occurred while retrieving cases."});
+            });
     },
 
     /**
@@ -31,31 +36,46 @@ const caseController = {
         const casesSearch = new CasesSearch(req.query.date_from, req.query.date_to, req.query.age_from,
             req.query.age_to, req.query.gender, req.query.state);
 
-        const result = await caseReportService.getTotalDeaths(casesSearch);
-
-        return res
-            .status(result.toHttpStatus())
-            .statusCode(result.toHttpStatusCode())
-            .json(result.result);
+        caseReportService.getTotalDeaths(casesSearch)
+            .then(data => {
+                res
+                    .status(200)
+                    .json({total_deaths: data ? data.length : 0});
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .json({message: err.message || "Some error occurred while retrieving total deaths."});
+            });
     },
 
 
     getInformationLoad: async (req, res) => {
-        const result = await caseReportService.getInformationLoad();
-
-        return res
-            .status(result.toHttpStatus())
-            .statusCode(result.toHttpStatusCode())
-            .json(result.result);
+        caseReportService.getInformationLoad()
+            .then(data => {
+                res
+                    .status(200)
+                    .json(data);
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .json({message: err.message || "Some error occurred while retrieving information about load."});
+            });
     },
 
     loadNewCases: async (req, res) => {
-        const result = caseProcessService.loadNewCases();
-
-        return res
-            .status(result.toHttpStatus())
-            .statusCode(result.toHttpStatusCode())
-            .json(result.result);
+        caseProcessService.loadNewCases()
+            .then(data => {
+                res
+                    .status(200)
+                    .json(data);
+            })
+            .catch(err => {
+                res
+                    .status(500)
+                    .json({message: err.message || "Some error occurred while loading cases."});
+            });
     },
 
 }

@@ -1,77 +1,53 @@
-const Response = require("../entities/response");
-const ResponseStatus = require("../entities/response.status");
-
 const db = require("../models");
 const Case = db.cases;
 
 const CaseReportService = {
 
-    // todo
-    // https://www.freecodecamp.org/espanol/news/aprende-javascript-imports-exports-let-const-promisas-es6/
-
     /**
      * @description Gets total cases by filters
      * @param {CasesSearch} casesSearch     The filters
-     * @returns {Response}
+     * @returns cases
      */
     getTotalCases: (casesSearch) => {
-        const filters = this.loadTotalCasesFilters(casesSearch);
+        const filters = CaseReportService.loadTotalCasesFilters(casesSearch);
 
-        Case.find(filters)
-            .then(data => {
-                return new Response(ResponseStatus.Success, {total_cases_registers: data ? data.length : 0});
-            })
-            .catch(err => {
-                return new Response(ResponseStatus.Error, {message: err.message
-                    || "Some error occurred while retrieving cases."});
-            });
+        return Case.find(filters);
     },
 
     /**
      * @description Gets total deaths by filters
      * @param {CasesSearch} casesSearch     The filters
-     * @returns {Response}
+     * @returns cases
      */
     getTotalDeaths: (casesSearch) => {
-        const filters = this.loadDeathsCasesFilters(casesSearch);
+        const filters = CaseReportService.loadDeathsCasesFilters(casesSearch);
 
-        Case.find(filters)
-            .then(data => {
-                return new Response(ResponseStatus.Success, {total_cases_registers: data ? data.length : 0});
-            })
-            .catch(err => {
-                return new Response(ResponseStatus.Error, {message: err.message
-                    || "Some error occurred while retrieving total deaths."});
-            });
+        return Case.find(filters);
     },
 
     /**
      * @description Gets information about last load
-     * @returns {Response} if success, return date and quantity registers had been loaded
+     * @returns {*} if success, return date and quantity registers had been loaded
      */
     getInformationLoad: () => {
-        Case.find().sort({creation_date: -1}).limit(1) // for MAX date
-            .then(dataMax => {
-                Case.count({creation_date: dataMax.creation_date}) // for count registers
-                    .then(dataCount => {
-                        return new Response(ResponseStatus.Success,
-                            {
-                                last_load: dataMax.creation_date,
+        return new Promise(function (resolve, reject) {
+            Case.find().sort({creation_date: -1}).limit(1) // for MAX date
+                .then(dataMax => {
+                    Case.countDocuments({creation_date: dataMax.creation_date}) // for count registers
+                        .then(dataCount => {
+                            resolve({
+                                last_load: dataMax && dataMax.length == 1 ? dataMax[0].creation_date : null,
                                 registers: dataCount
                             });
-                    })
-                    .catch(err => {
-                        return new Response(ResponseStatus.Error, {message: err.message
-                            || "Some error occurred while retrieving counting last registers loaded."});;
-                    });
-
-                return new Response(ResponseStatus.Success, {total_cases_registers: data ? data.length : 0});
-            })
-            .catch(err => {
-                return new Response(ResponseStatus.Error, {message: err.message
-                        || "Some error occurred while retrieving information about load."});
-            });
-
+                        })
+                        .catch(err => {
+                            reject({message: err.message || "Some error occurred while retrieving counting last registers loaded."});
+                        });
+                })
+                .catch(err => {
+                    reject({message: err.message || "Some error occurred while retrieving information about load."});
+                });
+        });
     },
 
     /***---- Auxiliary functions ----***/
@@ -90,7 +66,7 @@ const CaseReportService = {
         if (casesSearch.dateTo) {
             filters.symptoms_start_date.$lte = casesSearch.dateTo;
         }
-        this.loadGeneralFilters(casesSearch, filters);
+        CaseReportService.loadGeneralFilters(casesSearch, filters);
 
         return filters;
     },
@@ -109,7 +85,7 @@ const CaseReportService = {
         if (casesSearch.dateTo) {
             filters.death_date.$lte = casesSearch.dateTo;
         }
-        this.loadGeneralFilters(casesSearch, filters);
+        CaseReportService.loadGeneralFilters(casesSearch, filters);
 
         return filters;
     },
