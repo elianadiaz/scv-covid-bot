@@ -33,21 +33,29 @@ const CaseReportService = {
         return new Promise(function (resolve, reject) {
             Case.find().sort({creation_date: -1}).limit(1) // for MAX date
                 .then(dataMax => {
-                    Case.countDocuments({creation_date: dataMax.creation_date}) // for count registers
-                        .then(dataCount => {
-                            resolve({
-                                last_load: dataMax && dataMax.length == 1 ? dataMax[0].creation_date : null,
-                                registers: dataCount
-                            });
-                        })
-                        .catch(err => {
-                            reject({message: err.message || "Some error occurred while retrieving counting last registers loaded."});
+                    if (!dataMax) {
+                        resolve({
+                            last_load: null,
+                            registers: 0
                         });
-                })
-                .catch(err => {
-                    reject({message: err.message || "Some error occurred while retrieving information about load."});
+                    } else {
+                        // for count registers
+                        Case.countDocuments({creation_date: dataMax[0].creation_date}, function (err, count) {
+                            console.log("Number of documents:", count);
+
+                            if (err) {
+                                console.log("error contando: ", err);
+                                reject({message: err.message || "Some error occurred while retrieving counting last registers loaded."});
+                            } else {
+                                resolve({
+                                    last_load: dataMax && dataMax.length == 1 ? dataMax[0].creation_date : null,
+                                    registers: count
+                                });
+                            }
+                        });
+                    }
                 });
-        });
+            });
     },
 
     /***---- Auxiliary functions ----***/

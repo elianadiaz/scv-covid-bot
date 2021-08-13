@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Genders = Object.freeze({
-    Male: 'male',
-    Female: 'female',
-    Other: 'other',
-});
+const Genders = require('./Genders')
 
 // create case schema & model
 const CaseSchema = new Schema({
@@ -24,14 +20,14 @@ const CaseSchema = new Schema({
     },
     symptoms_start_date: {
         type: Date,
-        default: Date.now,
+        required: [true, 'Symptoms start date field is required'],
     },
     death_date: {
         type: Date,
     },
     creation_date: {
         type: Date,
-        default: Date.now,
+        required: [true, 'Creation date field is required'], // otra opcion es usar: default: Date.now,
     },
 });
 
@@ -42,4 +38,3 @@ Object.assign(CaseSchema.statics, {
 const Case = mongoose.model('case', CaseSchema);
 
 module.exports = Case;
-module.exports = Genders;

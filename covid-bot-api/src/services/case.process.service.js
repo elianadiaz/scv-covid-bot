@@ -1,19 +1,16 @@
 const CSV = require('csv-string');
 
-/*const db = require("../models");
-const Case = db.cases;*/
+const db = require("../models");
+const Case = db.cases;
 
-const CaseModel = require("../models/case");
-
-const Genders = require("../models/case");
-const Case = require("../models/case");
+const Genders = require("../models/Genders");
 
 const HEADER = "\"id_evento_caso\",\"sexo\",\"edad\",\"edad_años_meses\",\"residencia_pais_nombre\",\"residencia_provincia_nombre\",\"residencia_departamento_nombre\",\"carga_provincia_nombre\",\"fecha_inicio_sintomas\",\"fecha_apertura\",\"sepi_apertura\",\"fecha_internacion\",\"cuidado_intensivo\",\"fecha_cui_intensivo\",\"fallecido\",\"fecha_fallecimiento\",\"asistencia_respiratoria_mecanica\",\"carga_provincia_id\",\"origen_financiamiento\",\"clasificacion\",\"clasificacion_resumen\",\"residencia_provincia_id\",\"fecha_diagnostico\",\"residencia_departamento_id\",\"ultima_actualizacion\"";
 const GENDER_POSITION = 1; // column: sexo
 const AGE_POSITION = 2; // column: edad
 const AGE_YEARS_MONTHS_POSITION = 3; // column: edad_años_meses
 const STATE_POSITION = 5; // column: residencia_provincia_nombre
-const SYMPTOMS_START_DATE_POSITION = 8; // column: fecha_inicio_sintomas
+const SYMPTOMS_START_DATE_POSITION = 9; // column: fecha_apertura (hubiera preferido usar fecha_inicio_sintomas pero muchos no tienen este valor)
 const DEATH_DATE_POSITION = 15; // column: fecha_fallecimiento
 
 const AgeYearMonths = Object.freeze({
@@ -31,6 +28,8 @@ const CaseProcessService = {
             const fs = require('fs')
                 , es = require('event-stream');
 
+            const creationDate = Date.now(); // this is for count
+
             const s = fs.createReadStream('Covid-test.csv')
                 .pipe(es.split())
                 .pipe(es.mapSync(function(line){
@@ -38,7 +37,7 @@ const CaseProcessService = {
                         s.pause();
 
                         // process line here and call s.resume()
-                        CaseProcessService.processLine(line);
+                        CaseProcessService.processLine(line, creationDate);
 
                         // resume the readstream, possibly from a callback
                         s.resume();
@@ -60,9 +59,10 @@ const CaseProcessService = {
     /**
      * @description Process a line
      * @param {String} line     The line
+     * @param {Date} creationDate   The creation date
      * @returns {*}
      */
-    processLine: function (line) {
+    processLine: function (line, creationDate) {
         if (!line) {
             return;
         }
@@ -74,38 +74,29 @@ const CaseProcessService = {
         const rows = CSV.parse(line);
         console.log(rows);
 
-        // Create a Case
-        const oneCase = CaseProcessService.toCase(rows[0]);
-
-
-
         // Save Case in the database
-        Case({
-            state: rows[STATE_POSITION] ? (rows[STATE_POSITION]).toUpperCase() : null,
-            gender: CaseProcessService.getGender(rows[GENDER_POSITION]),
-            age: CaseProcessService.getAge(rows[AGE_POSITION], rows[AGE_YEARS_MONTHS_POSITION]),
-            symptoms_start_date: rows[SYMPTOMS_START_DATE_POSITION] ? rows[SYMPTOMS_START_DATE_POSITION] : null, // todo revisar q la fecha este bien
-            death_date: rows[DEATH_DATE_POSITION] ? rows[DEATH_DATE_POSITION] : null, // todo revisar que la fecha este bien
-        }).save()
-        .catch(err => {
-            console.log("Linea con error: ", line)
-            console.log("Some error occurred while creating the Case.", err);
-            console.log(err.message);
-        });
+        Case.create(CaseProcessService.toCase(rows[0], creationDate))
+            .catch(err => {
+                console.log("Line with error: ", line)
+                console.log("Some error occurred while creating the Case.", err);
+                console.log(err.message);
+            });
     },
 
     /**
      * @description rows to Case
      * @param {string[]} rows     The rows
+     * @param {Date} creationDate   The creation date
      * @returns {*}
      */
-    toCase: function (rows) {
+    toCase: function (rows, creationDate) {
         return {
             state: rows[STATE_POSITION] ? (rows[STATE_POSITION]).toUpperCase() : null,
             gender: CaseProcessService.getGender(rows[GENDER_POSITION]),
             age: CaseProcessService.getAge(rows[AGE_POSITION], rows[AGE_YEARS_MONTHS_POSITION]),
-            symptoms_start_date: rows[SYMPTOMS_START_DATE_POSITION] ? rows[SYMPTOMS_START_DATE_POSITION] : null, // todo revisar q la fecha este bien
-            death_date: rows[DEATH_DATE_POSITION] ? rows[DEATH_DATE_POSITION] : null, // todo revisar que la fecha este bien
+            symptoms_start_date: rows[SYMPTOMS_START_DATE_POSITION] ? rows[SYMPTOMS_START_DATE_POSITION] : null,
+            death_date: rows[DEATH_DATE_POSITION] ? rows[DEATH_DATE_POSITION] : null,
+            creation_date : creationDate,
         };
     },
 

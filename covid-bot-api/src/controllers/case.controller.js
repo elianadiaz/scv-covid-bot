@@ -49,7 +49,6 @@ const caseController = {
             });
     },
 
-
     getInformationLoad: async (req, res) => {
         caseReportService.getInformationLoad()
             .then(data => {
