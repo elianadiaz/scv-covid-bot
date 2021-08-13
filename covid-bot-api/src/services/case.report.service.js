@@ -41,10 +41,7 @@ const CaseReportService = {
                     } else {
                         // for count registers
                         Case.countDocuments({creation_date: dataMax[0].creation_date}, function (err, count) {
-                            console.log("Number of documents:", count);
-
                             if (err) {
-                                console.log("error contando: ", err);
                                 reject({message: err.message || "Some error occurred while retrieving counting last registers loaded."});
                             } else {
                                 resolve({
