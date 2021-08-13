@@ -68,6 +68,8 @@ const CaseReportService = {
     loadTotalCasesFilters: function (casesSearch) {
         const filters = {};
         // Date: from - to
+
+        // Ex: db.cases.find({symptoms_start_date: {$gte: new Date('2020-05-31T21:00:00-03:00'), $lte: new Date()}})
         if (casesSearch.dateFrom) {
             filters.symptoms_start_date.$gte = casesSearch.dateFrom;
         }

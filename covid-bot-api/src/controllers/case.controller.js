@@ -18,7 +18,7 @@ const caseController = {
             .then(data => {
                 res
                     .status(200)
-                    .json({total_cases_registers: data ? data.length : 0});
+                    .json({total_registered_cases: data ? data.length : 0});
             })
             .catch(err => {
                 res
@@ -65,10 +65,9 @@ const caseController = {
 
     loadNewCases: async (req, res) => {
         caseProcessService.loadNewCases()
-            .then(data => {
+            .then(() => {
                 res
-                    .status(200)
-                    .json(data);
+                    .status(200);
             })
             .catch(err => {
                 res
