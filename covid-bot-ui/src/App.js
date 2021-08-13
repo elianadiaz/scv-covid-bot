@@ -1,14 +1,12 @@
-import './App.css';
-
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-
-import CovidForm from "./components/CovidForm";
-import React from "react";
-import Result from "./components/Result";
 import Typography from "@material-ui/core/Typography";
+
+import Result from "./components/result/Result";
+import Form from "./components/form/Form";
+
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -48,7 +46,7 @@ function App() {
                       <Grid item xs={12} sm={1}>
                       </Grid>
                       <Grid item xs={12} sm={5}>
-                          <Paper className={classes.paper}><CovidForm /></Paper>
+                          <Paper className={classes.paper}><Form /></Paper>
                       </Grid>
                       <Grid item xs={12} sm={5}>
                           <Paper className={classes.paper}><Result /></Paper>

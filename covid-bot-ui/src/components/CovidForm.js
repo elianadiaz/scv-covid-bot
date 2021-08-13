@@ -71,12 +71,37 @@ export default function CovidForm() {
     const handleSubmit = (event) => {
         alert('Ha submiteado');
         // Pasa este armado a Result
-        let query = dateFrom ? "date_from=" + dateFrom : "";
-        query += dateTo ? "date_to=" + dateTo : "";
-        query += ageFrom ? "age_from=" + ageFrom : "";
-        query += ageTo ? "age_to=" + ageTo : "";
-        query += gender ? "gender=" + gender : "";
-        query += state ? "state=" + state : "";
+        let query = dateFrom ? "?date_from=" + (dateFrom.getFullYear() + "/" + dateFrom.getMonth() + "/" + dateFrom.getDay()) : "";
+        if (dateTo) {
+            if (query.length > 0) {
+                query += "&";
+            }
+            query += dateTo ? "date_to=" + (dateTo.getFullYear() + "/" + (dateTo.getMonth() + 1) + "/" + dateTo.getDaysInMonth()) : "";
+        }
+        if (ageFrom) {
+            if (query.length > 0) {
+                query += "&";
+            }
+            query += ageFrom ? "age_from=" + ageFrom : "";
+        }
+        if (ageTo) {
+            if (query.length > 0) {
+                query += "&";
+            }
+            query += ageTo ? "age_to=" + ageTo : "";
+        }
+        if (gender) {
+            if (query.length > 0) {
+                query += "&";
+            }
+            query += gender ? "gender=" + gender : "";
+        }
+        if (state) {
+            if (query.length > 0) {
+                query += "&";
+            }
+            query += state ? "state=" + state : "";
+        }
 
         Result({query_param: query});
 
