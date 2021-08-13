@@ -24,8 +24,6 @@ class Result extends React.Component {
     }
 
     handleSynchronizeClick() {
-        alert('Quiere sincronizar CON URL: ');
-
         axios.post("http://localhost:8080/covid/update")
             .then(response => {
                 if (response.status === 200) {

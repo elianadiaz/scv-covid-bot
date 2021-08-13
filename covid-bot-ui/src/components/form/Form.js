@@ -15,8 +15,6 @@ import FormLabel from '@material-ui/core/FormLabel';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-import Result from "../result/Result";
-
 import axios from "axios";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -77,19 +75,9 @@ class Form extends React.Component {
                             registeredCases: responseTotalCases.data.total_registered_cases,
                             deaths: responseDeaths.data.total_deaths,
                             lastImport: responseLastSync.status === 200
-                                    ? (responseLastSync.data.last_load + " (registers: " + responseLastSync.data.registers + ")")
-                                    : "-"},
-                    });
-
-                    /*return (
-                        <Result
-                            registeredCases={responseTotalCases.data.total_registered_cases}
-                            deaths={responseDeaths.data.total_deaths}
-                            lastImport={responseLastSync.status === 200
                                 ? (responseLastSync.data.last_load + " (registers: " + responseLastSync.data.registers + ")")
-                                : "-"}
-                        />
-                    );*/
+                                : "-"},
+                    });
                 }
                 this.setState({message: "Ocurrió un problema, intente más tarde."});
             })).catch(errors => {
