@@ -23,6 +23,10 @@ class Result extends React.Component {
         }
     }
 
+    UNSAFE_componentWillReceiveProps(next_props, next_context) {
+        this.setState({ loading: true });
+    }
+
     handleSynchronizeClick() {
         axios.post("http://localhost:8080/covid/update")
             .then(response => {
@@ -57,9 +61,11 @@ class Result extends React.Component {
                     Deaths
                 </Typography>
                 <br />
-                <Typography variant="h6" gutterBottom>
+                <br />
+                <Typography variant="h5" gutterBottom>
                     Last import made on {this.state.lastImport}
                 </Typography>
+                <br />
                 <Button variant="outlined" color="primary"
                         onClick={() => this.handleSynchronizeClick()}>
                     Synchronize

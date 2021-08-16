@@ -3,7 +3,6 @@ import React from 'react';
 import {createStyles, makeStyles, Theme, withStyles} from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
@@ -16,6 +15,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 import axios from "axios";
+import Result from "../result/Result";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -60,6 +60,11 @@ class Form extends React.Component {
     }
 
     componentDidMount() {
+
+    }
+
+    handleSubmit() {
+        this.setState({message: "Cargando información..."});
         const queryParams = this.getQueryParams();
         // Fetch total registered cases and total deaths
         axios.all([this.getTotalRegisteredCases(queryParams), this.getTotalDeaths(queryParams), this.getInformationAboutLastSync()])
@@ -78,17 +83,21 @@ class Form extends React.Component {
                                 ? (responseLastSync.data.last_load + " (registers: " + responseLastSync.data.registers + ")")
                                 : "-"},
                     });
+                    return (
+                        <Result
+                            registeredCases={responseTotalCases.data.total_registered_cases}
+                            deaths={responseDeaths.data.total_deaths}
+                            lastImport={responseLastSync.status === 200
+                                ? (responseLastSync.data.last_load + " (registers: " + responseLastSync.data.registers + ")")
+                                : "-"}
+                        />
+                    );
                 }
                 this.setState({message: "Ocurrió un problema, intente más tarde."});
             })).catch(errors => {
             // react on errors.
             console.log("An error occurred getting the totals", errors);
         });
-    }
-
-    handleSubmit() {
-        this.setState({message: "Cargando información..."});
-
     }
 
     handleDateFromChange(value) {
@@ -119,7 +128,8 @@ class Form extends React.Component {
         const { classes } = this.props;
 
         return (
-            <form className={classes.formControl} onSubmit={() => this.handleSubmit()}>
+            <form className={classes.root} onSubmit={() => this.handleSubmit()}>
+                <br />
                 <div>
                     <FormLabel component="legend">Date</FormLabel>
                 </div>
@@ -158,6 +168,7 @@ class Form extends React.Component {
                     </Grid>
                 </div>
                 <br />
+                <br />
                 <div>
                     <FormLabel component="legend">Age</FormLabel>
                 </div>
@@ -188,9 +199,10 @@ class Form extends React.Component {
                     </Grid>
                 </div>
                 <br />
+                <br />
                 <div>
                     <Grid container justifyContent="space-around">
-                        <FormControl className={classes.formControl}>
+                        <div className={classes.formControl}>
                             <InputLabel id="gender-label">Gender</InputLabel>
                             <Select
                                 labelId="gender-label"
@@ -202,8 +214,8 @@ class Form extends React.Component {
                                 <MenuItem value="female">Mujer</MenuItem>
                                 <MenuItem value="other">Otro</MenuItem>
                             </Select>
-                        </FormControl>
-                        <FormControl className={classes.formControl}>
+                        </div>
+                        <div className={classes.formControl}>
                             <InputLabel id="state-label">State</InputLabel>
                             <Select
                                 labelId="state-label"
@@ -215,9 +227,10 @@ class Form extends React.Component {
                                 <MenuItem value="BSAS">Provincia de Buenos Aires</MenuItem>
                                 <MenuItem value="CORDOBA">Córdoba</MenuItem>
                             </Select>
-                        </FormControl>
+                        </div>
                     </Grid>
                 </div>
+                <br />
                 <br />
                 <br />
                 <div>
